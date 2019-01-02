@@ -17,15 +17,15 @@ import (
 // AuthTokens - Not mandatory. "History". All tokens that was used by this user. Don't used for json serialization.
 // Role - Mandatory. We don't need to put this field to json, so we have only bson mapping.
 type User struct {
-	Id          int64        `json:"id", bson:"_id"`
-	Nickname    string       `json:"nickname", bson:"nickname"`
-	Email       string       `json:"email", bson:"email"`
-	Password    string       `json:"password", bson:"password"`
-	FirstName   string       `json:"firstName", bson:"firstName"`
-	SecondName  string       `json:"secondName", bson:"secondName"`
-	Gender      string       `json:"gender", bson:"gender"`
-	PhoneNumber string       `json:"phoneNumber", bson:"phoneNumber"`
-	CreatedTime time.Time    `json:"createdTime", bson:"createdTime"`
+	Id          int64        `json:"id" bson:"_id"`
+	Nickname    string       `json:"nickname" bson:"nickname"`
+	Email       string       `json:"email" bson:"email"`
+	Password    string       `json:"password" bson:"password"`
+	FirstName   string       `json:"firstName" bson:"firstName"`
+	SecondName  string       `json:"secondName" bson:"secondName"`
+	Gender      string       `json:"gender" bson:"gender"`
+	PhoneNumber string       `json:"phoneNumber" bson:"phoneNumber"`
+	CreatedTime time.Time    `json:"createdTime" bson:"createdTime"`
 	AuthTokens  []*AuthToken `bson:"authTokens"`
 	Role        *UserRole    `bson:"role"`
 }
