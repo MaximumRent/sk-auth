@@ -5,7 +5,7 @@ version: '3'
 #    external:
 #      name: sk
 services:
-  mongodb:
+  sk_mongo:
     image: 'mongo:xenial'
     container_name: "sk_mongo"
     environment:
@@ -14,6 +14,6 @@ services:
       - MONGO_INITDB_DATABASE=sk_auth
     volumes:
       - ./data/db:/data/db
-      - ./init.js:/docker-entrypoint-initdb.d/init.js
+      - ./db/database-init.js:/docker-entrypoint-initdb.d/database-init.js
     ports:
       - 27017:27017
