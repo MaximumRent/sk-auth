@@ -1,14 +1,19 @@
 version: '3'
+# First of all, need to create network with name 'sk'
+#networks:
+#  default:
+#    external:
+#      name: sk
 services:
   mongodb:
     image: 'mongo:xenial'
-    container_name: "mongodb"
+    container_name: "sk_mongo"
     environment:
       - MONGO_DATA_DIR=/data/db
       - MONGO_LOG_DIR=/dev/null
+      - MONGO_INITDB_DATABASE=sk_auth
     volumes:
       - ./data/db:/data/db
-      - ./db/database-init.js:/docker-entrypoint-initdb.d/database-init.js
+      - ./init.js:/docker-entrypoint-initdb.d/init.js
     ports:
       - 27017:27017
-    command: mongod --smallfiles --logpath=/dev/null
