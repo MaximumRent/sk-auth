@@ -1,5 +1,9 @@
 package errors
 
+import (
+	"fmt"
+)
+
 // Custom error for mongo operations.
 // Has cause and operation type.
 type MongoOperationError struct {
@@ -8,5 +12,5 @@ type MongoOperationError struct {
 }
 
 func (error *MongoOperationError) Error() string {
-	return nil
+	return fmt.Sprintf("Error on operation [%s]. Cause: %s.", error.operationType, error.cause)
 }

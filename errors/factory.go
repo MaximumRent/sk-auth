@@ -2,10 +2,13 @@ package errors
 
 // Here described factory methods for custom errors.
 
-func GetMongoOperationError(cause, operation string) error {
-	return nil
+func GetMongoOperationError(cause, operationType string) error {
+	mongoOperationError := new(MongoOperationError)
+	mongoOperationError.cause = cause
+	mongoOperationError.operationType = operationType
+	return mongoOperationError
 }
 
-func GetValidationError() error {
-	return nil
+func GetEmptyValidationError() error {
+	return new(EntityValidationError)
 }
