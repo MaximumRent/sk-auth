@@ -75,7 +75,7 @@ var userCollectionFieldValidator = {
             roles: rolesDefinition
         }
     }
-}
+};
 
 // --- Create collection ---
 
