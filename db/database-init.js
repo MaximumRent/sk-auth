@@ -30,6 +30,9 @@ var rolesDefinition = {
             name: {
                 bsonType: "string"
             },
+            code: {
+                bsonType: "long"
+            },
             isRemovable: {
                 bsonType: "boolean"
             }
@@ -91,21 +94,25 @@ db.users.createIndex({ "email": 1 }, { unique: true });
 
 var adminRole = {
     name: "Admin",
+    code: 0,
     isRemovable: false
 };
 
 var userRole = {
     name: "User",
+    code: 1,
     isRemovable: false
 };
 
 var companyOwnerRole = {
     name: "Company Owner",
+    code: 2,
     isRemovable: true
 };
 
 var companyManagerRole = {
     name: "Company Manager",
+    code: 3,
     isRemovable: true
 };
 
