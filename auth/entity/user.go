@@ -19,9 +19,9 @@ import (
 // Roles - Mandatory. We don't need to put this field to json, so we have only bson mapping.
 type User struct {
 	Id          int64        `json:"id" bson:"_id"`
-	Nickname    string       `json:"nickname" bson:"nickname"`
-	Email       string       `json:"email" bson:"email"`
-	Password    string       `json:"password" bson:"password"`
+	Nickname    string       `json:"nickname" bson:"nickname" binding:"required"`
+	Email       string       `json:"email" bson:"email" binding:"required"`
+	Password    string       `json:"password" bson:"password" binding:"required"`
 	FirstName   string       `json:"firstName" bson:"firstName"`
 	LastName    string       `json:"lastName" bson:"lastName"`
 	Gender      string       `json:"gender" bson:"gender"`

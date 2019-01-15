@@ -13,5 +13,5 @@ type AuthToken struct {
 	LoginTime  time.Time   `bson:"loginTime"`
 	LogoutTime time.Time   `bson:"logoutTime"`
 	AuthDevice *AuthDevice `json:"authDevice" bson:"authDevice"`
-	JWTToken   *jwt.Token  `json:"token" bson:"token"`
+	//JWTToken   *jwt.Token  `json:"token" bson:"token"`
 }
