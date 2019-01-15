@@ -11,6 +11,7 @@ const (
 
 func main() {
 	router := gin.Default()
+	api.InitMiddleware(router)
 	api.InitOpenApi(router)
 	api.InitSecureApi(router)
 	router.Run(_DEFAULT_ADDRESS)
