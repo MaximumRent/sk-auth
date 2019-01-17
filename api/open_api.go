@@ -22,8 +22,12 @@ func InitOpenApi(router *gin.Engine) {
 // REGISTER_USER_PATH
 func registerUser(context *gin.Context) {
 	var user *entity.User
-	if err := context.ShouldBindJSON(&user); err != nil {
+	if err := context.BindJSON(&user); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if !user.SelfValidate() {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Entity validation error"})
 		return
 	}
 	println(user.Password)

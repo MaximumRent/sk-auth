@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"gopkg.in/go-playground/validator.v9"
 	"sk-auth/auth/crypto"
 	"time"
 )
@@ -19,9 +20,9 @@ import (
 // Roles - Mandatory. We don't need to put this field to json, so we have only bson mapping.
 type User struct {
 	Id          int64        `json:"id" bson:"_id"`
-	Nickname    string       `json:"nickname" bson:"nickname" binding:"required"`
-	Email       string       `json:"email" bson:"email" binding:"required"`
-	Password    string       `json:"password" bson:"password" binding:"required"`
+	Nickname    string       `json:"nickname" bson:"nickname" validate:"required"`
+	Email       string       `json:"email" bson:"email" validate:"required,email"`
+	Password    string       `json:"password" bson:"password" validate:"required"`
 	FirstName   string       `json:"firstName" bson:"firstName"`
 	LastName    string       `json:"lastName" bson:"lastName"`
 	Gender      string       `json:"gender" bson:"gender"`
@@ -34,6 +35,13 @@ type User struct {
 const (
 	_UNDEFINED_PASSWORD = "undefined"
 )
+
+func (self *User) SelfValidate() bool {
+	if err := validator.New().Struct(self); err != nil {
+		return false
+	}
+	return true
+}
 
 // Factory function for User entity
 func CreateUser(nickname, email, password string) {
