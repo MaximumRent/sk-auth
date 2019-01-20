@@ -21,10 +21,6 @@ func InitOpenApi(router *gin.Engine) {
 
 // REGISTER_USER_PATH
 func registerUser(context *gin.Context) {
-	payload, isPresented := context.Get(PAYLOAD_KEY)
-	if !isPresented {
-		context.JSON(http.StatusBadRequest, gin.H{"error": "Payload not presented!"})
-		return
-	}
+	payload := context.MustGet(PAYLOAD_KEY)
 	context.JSON(http.StatusOK, gin.H{"status": payload})
 }

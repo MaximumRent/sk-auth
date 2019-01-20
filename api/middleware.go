@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/mitchellh/mapstructure"
 	"net/http"
 	"sk-auth/auth/entity"
 	"sk-auth/validation"
@@ -42,16 +43,6 @@ func EntityValidationMiddleware(context *gin.Context) {
 		return
 	}
 	context.Set(PAYLOAD_KEY, payload)
-
-	//var entity validation.SelfValidatable
-	//if err := context.BindJSON(&entity); err != nil {
-	//	context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	//	return
-	//}
-	//if err := entity.SelfValidate(); err != nil {
-	//	context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	//	return
-	//}
 }
 
 // Extracts self-validatable data from payload based on message code
@@ -60,8 +51,11 @@ func EntityValidationMiddleware(context *gin.Context) {
 func extractPayload(message *Message, context *gin.Context) validation.SelfValidatable {
 	payload := message.Payload.(map[string]interface{})
 	switch message.Code {
-	case 1:
-		user := entity.CreateUser(payload["nickname"].(string), payload["email"].(string), payload["password"].(string))
+	case _MAP_PAYLOAD_TO_USER_CODE:
+		var user = entity.CreateUser()
+		if err := mapstructure.Decode(payload, user); err != nil {
+			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
 		return user
 	default:
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid code type"})

@@ -40,24 +40,28 @@ const (
 )
 
 func (self *User) SelfValidate() error {
-	return validator.New().Struct(self)
+	err := validator.New().Struct(self)
+	if err == nil {
+		self.Password, err = crypto.EncryptPassword(self.Password)
+	}
+	return err
 }
 
 // Factory function for User entity
-func CreateUser(nickname, email, password string) *User {
+func CreateUser() *User {
 	user := new(User)
 	user.Id = bson.NewObjectId()
-	user.Nickname = nickname
-	user.Email = email
+	//user.Nickname = nickname
+	//user.Email = email
 	user.CreatedTime = time.Now()
-	encryptedPassword, err := crypto.EncryptPassword(password)
+	//encryptedPassword, err := crypto.EncryptPassword(password)
 	// If we has some problems with encryption
 	// set undefined value for password
-	if err == nil {
-		user.Password = encryptedPassword
-	} else {
-		user.Password = _UNDEFINED_PASSWORD
-	}
+	//if err == nil {
+	//	user.Password = encryptedPassword
+	//} else {
+	//	user.Password = _UNDEFINED_PASSWORD
+	//}
 	user.Roles = append(user.Roles, USER_ROLE)
 	return user
 }
