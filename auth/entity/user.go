@@ -2,7 +2,9 @@ package entity
 
 import (
 	"gopkg.in/go-playground/validator.v9"
+	"gopkg.in/mgo.v2/bson"
 	"sk-auth/auth/crypto"
+	"sk-auth/validation"
 	"time"
 )
 
@@ -19,33 +21,32 @@ import (
 // AuthTokens - Not mandatory. "History". All tokens that was used by this user. Don't used for json serialization.
 // Roles - Mandatory. We don't need to put this field to json, so we have only bson mapping.
 type User struct {
-	Id          int64        `json:"id" bson:"_id"`
-	Nickname    string       `json:"nickname" bson:"nickname" validate:"required"`
-	Email       string       `json:"email" bson:"email" validate:"required,email"`
-	Password    string       `json:"password" bson:"password" validate:"required"`
-	FirstName   string       `json:"firstName" bson:"firstName"`
-	LastName    string       `json:"lastName" bson:"lastName"`
-	Gender      string       `json:"gender" bson:"gender"`
-	PhoneNumber string       `json:"phoneNumber" bson:"phoneNumber"`
-	CreatedTime time.Time    `json:"createdTime" bson:"createdTime"`
-	AuthTokens  []*AuthToken `bson:"tokens"`
-	Roles       []*UserRole  `bson:"roles"`
+	Id             bson.ObjectId `json:"id" bson:"_id"`
+	Nickname       string        `json:"nickname" bson:"nickname" validate:"required"`
+	Email          string        `json:"email" bson:"email" validate:"required,email"`
+	Password       string        `json:"password" bson:"password" validate:"required"`
+	FirstName      string        `json:"firstName" bson:"firstName"`
+	LastName       string        `json:"lastName" bson:"lastName"`
+	Gender         string        `json:"gender" bson:"gender"`
+	PhoneNumber    string        `json:"phoneNumber" bson:"phoneNumber"`
+	CreatedTime    time.Time     `json:"createdTime" bson:"createdTime"`
+	AuthTokens     []*AuthToken  `bson:"tokens"`
+	Roles          []*UserRole   `bson:"roles"`
+	selfValidation validation.SelfValidatable
 }
 
 const (
 	_UNDEFINED_PASSWORD = "undefined"
 )
 
-func (self *User) SelfValidate() bool {
-	if err := validator.New().Struct(self); err != nil {
-		return false
-	}
-	return true
+func (self *User) SelfValidate() error {
+	return validator.New().Struct(self)
 }
 
 // Factory function for User entity
-func CreateUser(nickname, email, password string) {
+func CreateUser(nickname, email, password string) *User {
 	user := new(User)
+	user.Id = bson.NewObjectId()
 	user.Nickname = nickname
 	user.Email = email
 	user.CreatedTime = time.Now()
@@ -58,4 +59,5 @@ func CreateUser(nickname, email, password string) {
 		user.Password = _UNDEFINED_PASSWORD
 	}
 	user.Roles = append(user.Roles, USER_ROLE)
+	return user
 }

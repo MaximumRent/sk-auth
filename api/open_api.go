@@ -3,7 +3,6 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"sk-auth/auth/entity"
 )
 
 // API paths
@@ -14,6 +13,7 @@ const (
 
 func InitOpenApi(router *gin.Engine) {
 	openGroup := router.Group(OPEN_API_GROUP)
+	openGroup.Use(MessageMappingMiddleware, EntityValidationMiddleware)
 	{
 		openGroup.POST(REGISTER_USER_PATH, registerUser)
 	}
@@ -21,15 +21,10 @@ func InitOpenApi(router *gin.Engine) {
 
 // REGISTER_USER_PATH
 func registerUser(context *gin.Context) {
-	var user *entity.User
-	if err := context.BindJSON(&user); err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	payload, isPresented := context.Get(PAYLOAD_KEY)
+	if !isPresented {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Payload not presented!"})
 		return
 	}
-	if !user.SelfValidate() {
-		context.JSON(http.StatusBadRequest, gin.H{"error": "Entity validation error"})
-		return
-	}
-	println(user.Password)
-	context.JSON(http.StatusOK, gin.H{"status": "you are logged in"})
+	context.JSON(http.StatusOK, gin.H{"status": payload})
 }
