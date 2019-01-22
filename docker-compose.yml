@@ -5,6 +5,12 @@ version: '3'
 #    external:
 #      name: sk
 services:
+  sk_rabbitmq:
+    image: rabbitmq:3.7.8-management
+    container_name: "sk_rabbitmq"
+    ports:
+      - "15672:15672" # Management port
+      - "5672:5672" # Service port
   sk_mongo:
     image: 'mongo:xenial'
     container_name: "sk_mongo"
