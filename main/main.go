@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"sk-auth/api"
+	"sk-auth/worker"
 )
 
 const (
@@ -14,5 +15,6 @@ func main() {
 	api.InitMiddleware(router)
 	api.InitOpenApi(router)
 	api.InitSecureApi(router)
+	go worker.GetBroker().Start()
 	router.Run(_DEFAULT_ADDRESS)
 }
