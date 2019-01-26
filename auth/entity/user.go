@@ -35,10 +35,6 @@ type User struct {
 	selfValidation validation.SelfValidatable
 }
 
-const (
-	_UNDEFINED_PASSWORD = "undefined"
-)
-
 func (self *User) SelfValidate() error {
 	err := validator.New().Struct(self)
 	if err == nil {
