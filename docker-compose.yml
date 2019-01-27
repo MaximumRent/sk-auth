@@ -5,15 +5,15 @@ version: '3'
 #    external:
 #      name: sk
 services:
-  sk_rabbitmq:
+  sk-rabbitmq:
     image: rabbitmq:3.7.8-management
-    container_name: "sk_rabbitmq"
+    container_name: "sk-rabbitmq"
     ports:
       - "15672:15672" # Management port
       - "5672:5672" # Service port
-  sk_mongo:
+  sk-mongo:
     image: 'mongo:xenial'
-    container_name: "sk_mongo"
+    container_name: "sk-mongo"
     environment:
       - MONGO_DATA_DIR=/data/db
       - MONGO_LOG_DIR=/dev/null

@@ -1,29 +1,22 @@
-// --- Init User collection ---
-var tokensDefinition = {
+// --- Init Role collection ---
+var accessPathDefinition = {
     bsonType: "array",
     items: {
         bsonType: "object",
-        required: [ "loginTime", "authDevice", "jwtToken" ],
+        required: [ "path", "method" ],
         properties: {
-            loginTime: {
-                bsonType: "date"
-            },
-            logoutTime: {
-                bsonType: "date"
-            },
-            authDevice: {
+            path: {
                 bsonType: "string"
             },
-            jwtToken: {
+            method: {
                 bsonType: "string"
             }
         }
     }
 };
 
-var rolesDefinition = {
-    bsonType: "array",
-    items: {
+var rolesCollectionFieldValidator = {
+    $jsonSchema: {
         bsonType: "object",
         required: [ "name", "isRemovable" ],
         properties: {
@@ -35,6 +28,78 @@ var rolesDefinition = {
             },
             isRemovable: {
                 bsonType: "boolean"
+            },
+            paths: accessPathDefinition
+        }
+    }
+};
+
+db.createCollection("roles", {
+    validator: rolesCollectionFieldValidator,
+    validationAction: "error",
+    validationLevel: "strict"
+});
+
+db.roles.createIndex({ "name": 1 }, { unique: true });
+db.roles.createIndex({ "code": 1 }, { unique: true });
+
+var adminRole = {
+    name: "admin",
+    code: 0,
+    isRemovable: false,
+    paths: [
+        {
+            path: "/*",
+            method: "ALL"
+        }
+    ]
+};
+
+var userRole = {
+    name: "user",
+    code: 1,
+    isRemovable: false,
+    paths: [
+        {
+            path: "/*",
+            method: "ALL"
+        }
+    ]
+};
+
+var adminRoleId = db.roles.insert(adminRole);
+var userRoleId = db.roles.insert(userRole);
+
+// --- Init User collection ---
+var tokensDefinition = {
+    bsonType: "array",
+    items: {
+        bsonType: "object",
+        required: [ "loginTime", "authDevice", "token" ],
+        properties: {
+            loginTime: {
+                bsonType: "date"
+            },
+            logoutTime: {
+                bsonType: "date"
+            },
+            authDevice: {
+                bsonType: "string"
+            },
+            token: {
+                bsonType: "string"
+            }
+        }
+    }
+};
+
+var rolesDefinition = {
+    bsonType: "array",
+    items: {
+        bsonType: "object",
+        properties: {
+            role_id: {
+                bsonType: "objectId"
             }
         }
     },
@@ -77,7 +142,7 @@ var userCollectionFieldValidator = {
     }
 };
 
-// --- Create collection ---
+// --- Create collections ---
 
 db.createCollection("users", {
     validator: userCollectionFieldValidator,
@@ -92,39 +157,53 @@ db.users.createIndex({ "email": 1 }, { unique: true });
 
 // -- Init data ---
 
-var adminRole = {
-    name: "Admin",
-    code: 0,
-    isRemovable: false
-};
-
-var userRole = {
-    name: "User",
-    code: 1,
-    isRemovable: false
-};
-
-var companyOwnerRole = {
-    name: "Company Owner",
-    code: 2,
-    isRemovable: true
-};
-
-var companyManagerRole = {
-    name: "Company Manager",
-    code: 3,
-    isRemovable: true
-};
-
 var admin = {
     nickname: "root",
     email: "admin@email.com",
     password: "$2a$04$u3MXPUix1X8Lg8b8AK4lZOIRCDLZmj/cI0UlHA4Ri2LSBMSBEvpAu",
     gender: "M",
-    roles: [ adminRole ]
+    roles: [
+        {
+            role_id: adminRoleId
+        }
+    ]
 };
 
 db.users.insert(admin);
+
+// var adminRole = {
+//     name: "Admin",
+//     code: 0,
+//     isRemovable: false
+// };
+//
+// var userRole = {
+//     name: "User",
+//     code: 1,
+//     isRemovable: false
+// };
+//
+// var companyOwnerRole = {
+//     name: "Company Owner",
+//     code: 2,
+//     isRemovable: true
+// };
+//
+// var companyManagerRole = {
+//     name: "Company Manager",
+//     code: 3,
+//     isRemovable: true
+// };
+
+// var admin = {
+//     nickname: "root",
+//     email: "admin@email.com",
+//     password: "$2a$04$u3MXPUix1X8Lg8b8AK4lZOIRCDLZmj/cI0UlHA4Ri2LSBMSBEvpAu",
+//     gender: "M",
+//     roles: [ adminRole ]
+// };
+//
+// db.users.insert(admin);
 
 // TODO: For Role entity need to create isDeletable field that will explain that it "default" roles for user, which we can't remove from user.
 
