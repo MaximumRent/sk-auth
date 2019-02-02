@@ -44,6 +44,7 @@ db.roles.createIndex({ "name": 1 }, { unique: true });
 db.roles.createIndex({ "code": 1 }, { unique: true });
 
 var adminRole = {
+    _id: 1,
     name: "admin",
     code: 0,
     isRemovable: false,
@@ -56,6 +57,7 @@ var adminRole = {
 };
 
 var userRole = {
+    _id: 2,
     name: "user",
     code: 1,
     isRemovable: false,
@@ -67,8 +69,8 @@ var userRole = {
     ]
 };
 
-var adminRoleId = db.roles.insert(adminRole);
-var userRoleId = db.roles.insert(userRole);
+var adminRoleId = db.roles.insertOne(adminRole).insertedId;
+var userRoleId = db.roles.insertOne(userRole).insertedId;
 
 // --- Init User collection ---
 var tokensDefinition = {
@@ -99,11 +101,10 @@ var rolesDefinition = {
         bsonType: "object",
         properties: {
             role_id: {
-                bsonType: "objectId"
+                bsonType: "long"
             }
         }
-    },
-    minItems: 1
+    }
 };
 
 var userCollectionFieldValidator = {
@@ -116,7 +117,7 @@ var userCollectionFieldValidator = {
             },
             email: {
                 bsonType: "string",
-                pattern: "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum|by|ru)\b"
+                pattern: "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum|by|ru)"
             },
             password: {
                 bsonType: "string"
@@ -145,9 +146,7 @@ var userCollectionFieldValidator = {
 // --- Create collections ---
 
 db.createCollection("users", {
-    validator: userCollectionFieldValidator,
-    validationAction: "error",
-    validationLevel: "strict",
+    validator: userCollectionFieldValidator
 });
 
 // --- Create indexes ---
@@ -162,11 +161,7 @@ var admin = {
     email: "admin@email.com",
     password: "$2a$04$u3MXPUix1X8Lg8b8AK4lZOIRCDLZmj/cI0UlHA4Ri2LSBMSBEvpAu",
     gender: "M",
-    roles: [
-        {
-            role_id: adminRoleId
-        }
-    ]
+    roles: [{role_id: NumberLong(1)}]
 };
 
 db.users.insert(admin);
