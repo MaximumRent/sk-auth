@@ -1,6 +1,7 @@
 package worker
 
 import (
+	"encoding/json"
 	"github.com/streadway/amqp"
 	"log"
 	"sk-auth/errors"
@@ -53,8 +54,17 @@ func subscribeToQueue(channel *amqp.Channel) {
 	errors.FailOnError(err, "Failed to register a consumer")
 	for deliver := range messages {
 		body := string(deliver.Body)
-
+		requestMessage := new(AuthRequestMessage)
+		err := json.Unmarshal([]byte(body), requestMessage)
+		if err != nil {
+			log.Println("Can't unmarshal message from RabbitMQ. Cause: ", err)
+		}
+		processMessage(requestMessage)
 	}
+}
+
+func processMessage(requestMessage *AuthRequestMessage) {
+
 }
 
 func initQueue(connection *amqp.Connection) {
