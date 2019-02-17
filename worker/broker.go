@@ -4,17 +4,13 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
+	"sk-auth/util"
 )
 
 type Broker interface {
 	Start()
 	Stop()
 }
-
-// Config types
-const (
-	_CONFIG_FILE_PATH = "./config.yml"
-)
 
 // Acceptable config types
 const (
@@ -23,7 +19,7 @@ const (
 
 func GetBroker() Broker {
 	yamlConf := make(map[interface{}]interface{})
-	data, err := ioutil.ReadFile(_CONFIG_FILE_PATH)
+	data, err := ioutil.ReadFile(util.SYS_CONFIG_FILE_PATH)
 	if err != nil {
 		log.Fatal("Error in reading file. Cause: %s", err)
 	}

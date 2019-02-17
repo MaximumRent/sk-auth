@@ -17,7 +17,7 @@ type RabbitMqBroker struct {
 }
 
 const (
-	_AUTH_QUEUE_NAME = "auth"
+	_AUTH_QUEUE_NAME = "sk-auth"
 )
 
 func (broker *RabbitMqBroker) Start() {
@@ -64,7 +64,10 @@ func subscribeToQueue(channel *amqp.Channel) {
 }
 
 func processMessage(requestMessage *AuthRequestMessage) {
-
+	println(requestMessage.MessageSource)
+	println(requestMessage.Path)
+	println(requestMessage.Email)
+	println(requestMessage.Token)
 }
 
 func initQueue(connection *amqp.Connection) {
@@ -92,8 +95,8 @@ func (broker *RabbitMqBroker) Stop() {
 
 func getRabbitMqBroker(brokerDef map[interface{}]interface{}) *RabbitMqBroker {
 	broker := new(RabbitMqBroker)
-	broker.ip = brokerDef["ip"].(string)
-	broker.port = brokerDef["port"].(string)
+	broker.ip = brokerDef["address"].(string)
+	broker.port = string(brokerDef["port"].(int))
 	broker.poolSize = brokerDef["poolSize"].(int)
 	return broker
 }
