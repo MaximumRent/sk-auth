@@ -17,7 +17,7 @@ func main() {
 	api.InitOpenApi(router)
 	api.InitSecureApi(router)
 	mongo.InitMongoDb()
-	defer mongo
+	defer mongo.CloseConnection()
 	go worker.GetBroker().Start()
 	router.Run(_DEFAULT_ADDRESS)
 }
