@@ -8,10 +8,11 @@ import (
 // LoginTime - time when user was logged in.
 // LogoutTime - time when user log outed.
 // AuthDevice - device which was used for auth. Can be 'Mobile' or 'Web' and unique identifier for device.
-// JWTToken - auth token.
+// Token - auth token.
 type AuthToken struct {
 	LoginTime  time.Time   `bson:"loginTime"`
 	LogoutTime time.Time   `bson:"logoutTime"`
 	AuthDevice *AuthDevice `json:"authDevice" bson:"authDevice"`
+	Token      string      `json:"token" bson:"token"`
 	//JWTToken   *jwt.Token  `json:"token" bson:"token"`
 }

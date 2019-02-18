@@ -5,21 +5,25 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"net/http"
 	"sk-auth/auth/entity"
+	"sk-auth/mongo"
 	"sk-auth/validation"
 )
 
-// Message codes
 const (
-	_MAP_PAYLOAD_TO_USER_CODE = 1
+	MESSAGE_KEY   = "message"
+	PAYLOAD_KEY   = "message.payload"
+	USER_INFO_KEY = "message.payload.userinfo"
 )
 
-const (
-	MESSAGE_KEY = "message"
-	PAYLOAD_KEY = "message.payload"
-)
-
-func InitMiddleware(router *gin.Engine) {
-
+// Middleware which validates user token
+func TokenValidationMiddleware(context *gin.Context) {
+	payload := context.MustGet(PAYLOAD_KEY)
+	shortUser := payload.(*entity.ShortUser)
+	err := mongo.ValidateAuthToken(shortUser.Email, shortUser.Token)
+	if err != nil {
+		context.JSON(http.StatusUnauthorized, gin.H{"error": "You haven't valid authentication token"})
+		return
+	}
 }
 
 func MessageMappingMiddleware(context *gin.Context) {
@@ -57,6 +61,23 @@ func extractPayload(message *Message, context *gin.Context) validation.SelfValid
 			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}
 		return user
+	case _MAP_PAYLOAD_TO_SHORT_USER:
+		shortUser := new(entity.ShortUser)
+		if err := mapstructure.Decode(payload, shortUser); err != nil {
+			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+		return shortUser
+	case _MAP_PAYLOAD_TO_COMPLEX_USER:
+		shortUser := new(entity.ShortUser)
+		if err := mapstructure.Decode(payload, shortUser); err != nil {
+			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+		var user = entity.CreateUser()
+		if err := mapstructure.Decode(payload, user); err != nil {
+			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+		context.Set(USER_INFO_KEY, user)
+		return shortUser
 	default:
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid code type"})
 		return nil

@@ -58,6 +58,6 @@ func CreateUser() *User {
 	//} else {
 	//	user.Password = _UNDEFINED_PASSWORD
 	//}
-	user.Roles = append(user.Roles, USER_ROLE)
+	//user.Roles = append(user.Roles, USER_ROLE)
 	return user
 }

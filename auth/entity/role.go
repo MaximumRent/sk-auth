@@ -1,31 +1,27 @@
 package entity
 
+const (
+	ADMIN_ROLE_ID      = 1
+	USER_ROLE_ID       = 2
+	COMPANY_OWNER_ID   = 3
+	COMPANY_MANAGER_ID = 4
+)
+
+const (
+	ADMIN_ROLE_NAME      = "admin"
+	USER_ROLE_NAME       = "user"
+	COMPANY_OWNER_NAME   = "companyOwner"
+	COMPANY_MANAGER_NAME = "companyManager"
+)
+
 type UserRole struct {
-	Name        string `json:"name" bson:"name"`
-	Code        int64  `json:"code" bson:"code"`
-	IsDeletable bool   `json:"isDeletable" bson:"isDeletable"`
+	Id          int         `bson:"_id"`
+	Name        string      `json:"name" bson:"name"`
+	Code        int64       `json:"code" bson:"code"`
+	IsDeletable bool        `json:"isDeletable" bson:"isDeletable"`
+	Paths       []*RolePath `bson:"paths"`
 }
 
-// DEFINED USER ROLES
-var (
-	ADMIN_ROLE = &UserRole{
-		Name:        "Admin",
-		Code:        0,
-		IsDeletable: false,
-	}
-	USER_ROLE = &UserRole{
-		Name:        "User",
-		Code:        1,
-		IsDeletable: false,
-	}
-	COMPANY_OWNER_ROLE = &UserRole{
-		Name:        "Company Owner",
-		Code:        2,
-		IsDeletable: false,
-	}
-	COMPANY_MANAGER_ROLE = &UserRole{
-		Name:        "Company Manager",
-		Code:        3,
-		IsDeletable: false,
-	}
-)
+type RolePath struct {
+	Path string `bson:"path"`
+}
