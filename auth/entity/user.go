@@ -8,6 +8,12 @@ import (
 	"time"
 )
 
+const (
+	UNDEFINED_GENDER = "Undefined"
+	MALE_GENDER      = "M"
+	FEMALE_GENDER    = "F"
+)
+
 // System user which uses for authentication in all systems.
 // Here, 'Mandatory' means this info is mandatory for user creating.
 // Nickname - Mandatory. Unique. User's nickname for all systems.
@@ -21,17 +27,17 @@ import (
 // AuthTokens - Not mandatory. "History". All tokens that was used by this user. Don't used for json serialization.
 // Roles - Mandatory. We don't need to put this field to json, so we have only bson mapping.
 type User struct {
-	Id             bson.ObjectId `json:"id" bson:"_id"`
-	Nickname       string        `json:"nickname" bson:"nickname" validate:"required"`
-	Email          string        `json:"email" bson:"email" validate:"required,email"`
-	Password       string        `json:"password" bson:"password" validate:"required"`
-	FirstName      string        `json:"firstName" bson:"firstName"`
-	LastName       string        `json:"lastName" bson:"lastName"`
-	Gender         string        `json:"gender" bson:"gender"`
-	PhoneNumber    string        `json:"phoneNumber" bson:"phoneNumber"`
-	CreatedTime    time.Time     `json:"createdTime" bson:"createdTime"`
-	AuthTokens     []*AuthToken  `bson:"tokens"`
-	Roles          []*UserRole   `bson:"roles"`
+	Id             bson.ObjectId    `json:"id" bson:"_id"`
+	Nickname       string           `json:"nickname" bson:"nickname" validate:"required"`
+	Email          string           `json:"email" bson:"email" validate:"required,email"`
+	Password       string           `json:"password" bson:"password" validate:"required"`
+	FirstName      string           `json:"firstName" bson:"firstName"`
+	LastName       string           `json:"lastName" bson:"lastName"`
+	Gender         string           `json:"gender" bson:"gender"`
+	PhoneNumber    string           `json:"phoneNumber" bson:"phoneNumber"`
+	CreatedTime    time.Time        `json:"createdTime" bson:"createdTime"`
+	AuthTokens     []*AuthToken     `bson:"tokens"`
+	Roles          []*ShortUserRole `bson:"roles"`
 	selfValidation validation.SelfValidatable
 }
 

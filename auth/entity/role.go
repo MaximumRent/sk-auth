@@ -14,6 +14,10 @@ const (
 	COMPANY_MANAGER_NAME = "companyManager"
 )
 
+type ShortUserRole struct {
+	Id int `bson:"role_id"`
+}
+
 type UserRole struct {
 	Id          int         `bson:"_id"`
 	Name        string      `json:"name" bson:"name"`

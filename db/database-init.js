@@ -3,12 +3,9 @@ var accessPathDefinition = {
     bsonType: "array",
     items: {
         bsonType: "object",
-        required: [ "path", "method" ],
+        required: ["path"],
         properties: {
             path: {
-                bsonType: "string"
-            },
-            method: {
                 bsonType: "string"
             }
         }
@@ -99,7 +96,7 @@ var rolesDefinition = {
         bsonType: "object",
         properties: {
             role_id: {
-                bsonType: "long"
+                bsonType: "integer"
             }
         }
     }
@@ -114,8 +111,8 @@ var userCollectionFieldValidator = {
                 bsonType: "string"
             },
             email: {
-                bsonType: "string"
-                // pattern: "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum|by|ru)"
+                bsonType: "string",
+                pattern: "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum|by|ru)"
             },
             password: {
                 bsonType: "string"
@@ -127,7 +124,7 @@ var userCollectionFieldValidator = {
                 bsonType: "string"
             },
             gender: {
-                enum: ["M", "F"]
+                enum: ["M", "F", "Undefined"]
             },
             phoneNumber: {
                 bsonType: "string"
@@ -159,7 +156,7 @@ var admin = {
     email: "admin@email.com",
     password: "$2a$04$u3MXPUix1X8Lg8b8AK4lZOIRCDLZmj/cI0UlHA4Ri2LSBMSBEvpAu",
     gender: "M",
-    roles: [{role_id: NumberLong(adminRoleId)}]
+    roles: [{role_id: adminRoleId}]
 };
 
 db.users.insert(admin);

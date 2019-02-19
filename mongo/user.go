@@ -13,12 +13,14 @@ func CreateUser(user entity.User) error {
 	if err != nil {
 		return err
 	}
-	user.Roles = append(user.Roles, userRole)
+	shortUserRole := &entity.ShortUserRole{Id: userRole.Id}
+	user.Roles = append(user.Roles, shortUserRole)
+	user.Gender = entity.UNDEFINED_GENDER
 	result, err := collection.InsertOne(context.TODO(), user)
 	if err != nil {
 		return err
 	}
-	log.Printf("Was created new user with id: %s", result.InsertedID)
+	log.Printf("Was created new user with id: %s\n", result.InsertedID)
 	return err
 }
 
