@@ -156,7 +156,8 @@ var admin = {
     email: "admin@email.com",
     password: "$2a$04$u3MXPUix1X8Lg8b8AK4lZOIRCDLZmj/cI0UlHA4Ri2LSBMSBEvpAu",
     gender: "M",
-    roles: [{role_id: adminRoleId}]
+    roles: [{role_id: adminRoleId}],
+    tokens: []
 };
 
 db.users.insert(admin);

@@ -2,12 +2,17 @@ package mongo
 
 import (
 	"context"
+	"errors"
 	"gopkg.in/mgo.v2/bson"
 	"log"
+	"sk-auth/auth/crypto"
 	"sk-auth/auth/entity"
 )
 
 func CreateUser(user entity.User) error {
+	if user.Nickname == "" {
+		return errors.New("User nickname can't be empty!")
+	}
 	collection := client.Database(SK_DB_NAME).Collection(USER_COLLECTION_NAME)
 	userRole, err := getRoleByName(entity.USER_ROLE_NAME)
 	if err != nil {
@@ -22,6 +27,30 @@ func CreateUser(user entity.User) error {
 	}
 	log.Printf("Was created new user with id: %s\n", result.InsertedID)
 	return err
+}
+
+func LoginUser(loginUserInfo entity.LoginUserInfo) (error, *entity.AuthToken, *entity.User) {
+	collection := client.Database(SK_DB_NAME).Collection(USER_COLLECTION_NAME)
+	filter := bson.M {
+		"$or": []bson.M {
+			{"email": loginUserInfo.Login},
+			{"nickname": loginUserInfo.Login},
+		},
+	}
+	user := new(entity.User)
+	err := collection.FindOne(context.TODO(), filter).Decode(&user)
+
+	if err != nil {
+		return err, nil, nil
+	}
+	err = crypto.ComparePasswords(loginUserInfo.Password, user.Password)
+
+	if err != nil {
+		return err, nil, nil
+	}
+	token := entity.GenerateAuthToken(loginUserInfo.AuthDevice)
+	err = AddAuthToken(user.Email, *token)
+	return err, token, user
 }
 
 func UpdateUserInfo(user entity.User) error {
@@ -56,13 +85,13 @@ func ValidateAuthToken(email, token string) error {
 
 func AddAuthToken(email string, token entity.AuthToken) error {
 	collection := client.Database(SK_DB_NAME).Collection(USER_COLLECTION_NAME)
-	filter := bson.D{
-		{"email", email},
+	filter := bson.M {
+		"email": email,
 	}
-	update := bson.D{
-		{"$push", bson.D{
-			{"tokens", token},
-		}},
+	update := bson.M {
+		"$push": bson.M {
+			"tokens": token,
+		},
 	}
 	result := collection.FindOneAndUpdate(context.TODO(), filter, update)
 	return result.Err()

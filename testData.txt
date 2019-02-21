@@ -1,0 +1,10 @@
+/registration
+{
+  "message":"Somebody once told me the world is gonna roll me",
+  "code": 1,
+  "payload": {
+	  "email":"",
+	  "nickname":"",
+	  "password":"5550123"
+  }
+}

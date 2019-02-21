@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"github.com/google/uuid"
 	"time"
 )
 
@@ -10,9 +11,16 @@ import (
 // AuthDevice - device which was used for auth. Can be 'Mobile' or 'Web' and unique identifier for device.
 // Token - auth token.
 type AuthToken struct {
-	LoginTime  time.Time   `bson:"loginTime"`
-	LogoutTime time.Time   `bson:"logoutTime"`
-	AuthDevice *AuthDevice `json:"authDevice" bson:"authDevice"`
-	Token      string      `json:"token" bson:"token"`
-	//JWTToken   *jwt.Token  `json:"token" bson:"token"`
+	LoginTime  time.Time   	`bson:"loginTime"`
+	LogoutTime time.Time   	`bson:"logoutTime"`
+	AuthDevice string 		`json:"authDevice" bson:"authDevice"`
+	Token      string      	`json:"token" bson:"token"`
+}
+
+func GenerateAuthToken(authDevice string) *AuthToken {
+	token := new(AuthToken)
+	token.AuthDevice = authDevice
+	token.LoginTime = time.Now()
+	token.Token = uuid.New().String()
+	return token
 }

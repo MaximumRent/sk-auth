@@ -78,6 +78,12 @@ func extractPayload(message *Message, context *gin.Context) validation.SelfValid
 		}
 		context.Set(USER_INFO_KEY, user)
 		return shortUser
+	case _MAP_PAYLOAD_TO_LOGIN_INFO:
+		loginInfo := new(entity.LoginUserInfo)
+		if err := mapstructure.Decode(payload, loginInfo); err != nil {
+			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+		return loginInfo
 	default:
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid code type"})
 		return nil

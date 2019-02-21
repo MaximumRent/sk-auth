@@ -25,3 +25,7 @@ func EncryptPassword(password string) (string, error) {
 	}
 	return string(encryptedBytes[:]), nil
 }
+
+func ComparePasswords(password string, encryptedPass string) error {
+	return bcrypt.CompareHashAndPassword([]byte(encryptedPass), []byte(password))
+}

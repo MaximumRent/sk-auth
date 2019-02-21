@@ -1,8 +1,8 @@
 package entity
 
 import (
+	"github.com/mongodb/mongo-go-driver/bson/primitive"
 	"gopkg.in/go-playground/validator.v9"
-	"gopkg.in/mgo.v2/bson"
 	"sk-auth/auth/crypto"
 	"sk-auth/validation"
 	"time"
@@ -27,17 +27,17 @@ const (
 // AuthTokens - Not mandatory. "History". All tokens that was used by this user. Don't used for json serialization.
 // Roles - Mandatory. We don't need to put this field to json, so we have only bson mapping.
 type User struct {
-	Id             bson.ObjectId    `json:"id" bson:"_id"`
-	Nickname       string           `json:"nickname" bson:"nickname" validate:"required"`
-	Email          string           `json:"email" bson:"email" validate:"required,email"`
-	Password       string           `json:"password" bson:"password" validate:"required"`
-	FirstName      string           `json:"firstName" bson:"firstName"`
-	LastName       string           `json:"lastName" bson:"lastName"`
-	Gender         string           `json:"gender" bson:"gender"`
-	PhoneNumber    string           `json:"phoneNumber" bson:"phoneNumber"`
-	CreatedTime    time.Time        `json:"createdTime" bson:"createdTime"`
-	AuthTokens     []*AuthToken     `bson:"tokens"`
-	Roles          []*ShortUserRole `bson:"roles"`
+	Id             primitive.ObjectID   `json:"id" bson:"_id"`
+	Nickname       string           	`json:"nickname" bson:"nickname" validate:"required"`
+	Email          string           	`json:"email" bson:"email" validate:"required,email"`
+	Password       string           	`json:"password" bson:"password" validate:"required"`
+	FirstName      string           	`json:"firstName" bson:"firstName"`
+	LastName       string           	`json:"lastName" bson:"lastName"`
+	Gender         string           	`json:"gender" bson:"gender"`
+	PhoneNumber    string           	`json:"phoneNumber" bson:"phoneNumber"`
+	CreatedTime    time.Time        	`json:"createdTime" bson:"createdTime"`
+	AuthTokens     []*AuthToken     	`bson:"tokens"`
+	Roles          []*ShortUserRole 	`bson:"roles"`
 	selfValidation validation.SelfValidatable
 }
 
@@ -52,18 +52,8 @@ func (self *User) SelfValidate() error {
 // Factory function for User entity
 func CreateUser() *User {
 	user := new(User)
-	user.Id = bson.NewObjectId()
-	//user.Nickname = nickname
-	//user.Email = email
 	user.CreatedTime = time.Now()
-	//encryptedPassword, err := crypto.EncryptPassword(password)
-	// If we has some problems with encryption
-	// set undefined value for password
-	//if err == nil {
-	//	user.Password = encryptedPassword
-	//} else {
-	//	user.Password = _UNDEFINED_PASSWORD
-	//}
-	//user.Roles = append(user.Roles, USER_ROLE)
+	user.Id = primitive.NewObjectID()
+	user.AuthTokens = make([]*AuthToken, 0)
 	return user
 }
