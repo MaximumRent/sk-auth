@@ -10,16 +10,17 @@ import (
 )
 
 const (
-	MESSAGE_KEY   = "message"
-	PAYLOAD_KEY   = "message.payload"
-	USER_INFO_KEY = "message.payload.userinfo"
+	MESSAGE_KEY         = "message"
+	PAYLOAD_KEY         = "message.payload"
+	USER_INFO_KEY       = "message.payload.userinfo"
+	SHORT_USER_INFO_KEY = "message.payload.userinfo"
 )
 
 // Middleware which validates user token
 func TokenValidationMiddleware(context *gin.Context) {
-	payload := context.MustGet(PAYLOAD_KEY)
+	payload := context.MustGet(SHORT_USER_INFO_KEY)
 	shortUser := payload.(*entity.ShortUser)
-	err := mongo.ValidateAuthToken(shortUser.Email, shortUser.Token)
+	err := mongo.ValidateAuthToken(shortUser.Email, shortUser.Nickname, shortUser.Token)
 	if err != nil {
 		context.JSON(http.StatusUnauthorized, gin.H{"error": "You haven't valid authentication token"})
 		return
@@ -55,7 +56,7 @@ func EntityValidationMiddleware(context *gin.Context) {
 func extractPayload(message *Message, context *gin.Context) validation.SelfValidatable {
 	payload := message.Payload.(map[string]interface{})
 	switch message.Code {
-	case _MAP_PAYLOAD_TO_USER_CODE:
+	case _MAP_PAYLOAD_TO_USER:
 		var user = entity.CreateUser()
 		if err := mapstructure.Decode(payload, user); err != nil {
 			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -77,6 +78,7 @@ func extractPayload(message *Message, context *gin.Context) validation.SelfValid
 			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}
 		context.Set(USER_INFO_KEY, user)
+		context.Set(SHORT_USER_INFO_KEY, shortUser)
 		return shortUser
 	case _MAP_PAYLOAD_TO_LOGIN_INFO:
 		loginInfo := new(entity.LoginUserInfo)
@@ -84,6 +86,12 @@ func extractPayload(message *Message, context *gin.Context) validation.SelfValid
 			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}
 		return loginInfo
+	case _MAP_PAYLOAD_TO_LOGOUT_USER:
+		logoutInfo := new(entity.LogoutUserInfo)
+		if err := mapstructure.Decode(payload, logoutInfo); err != nil {
+			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+		return logoutInfo
 	default:
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid code type"})
 		return nil

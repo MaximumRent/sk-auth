@@ -7,6 +7,7 @@ import (
 	"log"
 	"sk-auth/auth/crypto"
 	"sk-auth/auth/entity"
+	"time"
 )
 
 func CreateUser(user entity.User) error {
@@ -31,8 +32,8 @@ func CreateUser(user entity.User) error {
 
 func LoginUser(loginUserInfo entity.LoginUserInfo) (error, *entity.AuthToken, *entity.User) {
 	collection := client.Database(SK_DB_NAME).Collection(USER_COLLECTION_NAME)
-	filter := bson.M {
-		"$or": []bson.M {
+	filter := bson.M{
+		"$or": []bson.M{
 			{"email": loginUserInfo.Login},
 			{"nickname": loginUserInfo.Login},
 		},
@@ -55,41 +56,86 @@ func LoginUser(loginUserInfo entity.LoginUserInfo) (error, *entity.AuthToken, *e
 
 func UpdateUserInfo(user entity.User) error {
 	collection := client.Database(SK_DB_NAME).Collection(USER_COLLECTION_NAME)
-	filter := bson.D{
-		{"email", user.Email},
+	filter := bson.M{
+		"$or": []bson.M{
+			{"email": user.Email},
+			{"nickname": user.Nickname},
+		},
 	}
-	update := bson.D{
-		{"email", user.Email},
-		{"password", user.Password},
-		{"firstName", user.FirstName},
-		{"lastName", user.LastName},
-		{"nickname", user.Nickname},
-		{"gender", user.Gender},
-		{"phoneNumber", user.PhoneNumber},
+	// Here we don't update email, because it non-updatable user-info, email must be static
+	// Password also don't updated from here
+	update := bson.M{
+		"$set": bson.M{
+			"firstName":   user.FirstName,
+			"lastName":    user.LastName,
+			"nickname":    user.Nickname,
+			"gender":      user.Gender,
+			"phoneNumber": user.PhoneNumber,
+		},
 	}
 	result := collection.FindOneAndUpdate(context.TODO(), filter, update)
 	return result.Err()
 }
 
-func ValidateAuthToken(email, token string) error {
+func ValidateAuthToken(email, nickname, token string) error {
 	collection := client.Database(SK_DB_NAME).Collection(USER_COLLECTION_NAME)
-	filter := bson.D{
-		{"email", email},
-		{"tokens", bson.D{
-			{"token", token},
-		}},
+	filter := bson.M{
+		"$or": []bson.M{
+			{"email": email},
+			{"nickname": nickname},
+		},
 	}
-	result := collection.FindOne(context.TODO(), filter)
+	var user = &entity.User{}
+	err := collection.FindOne(context.TODO(), filter).Decode(&user)
+	if err != nil {
+		return err
+	}
+
+	hasValidToken := false
+	for _, authToken := range user.AuthTokens {
+		if authToken.Token == token && !authToken.LogoutTime.After(time.Date(2, 2, 2, 0, 0, 0, 0, time.UTC)) {
+			hasValidToken = true
+		}
+	}
+	if hasValidToken {
+		return nil
+	} else {
+		return errors.New("You haven't valid auth token")
+	}
+}
+
+func Logout(email, nickname, authDevice, token string) error {
+	collection := client.Database(SK_DB_NAME).Collection(USER_COLLECTION_NAME)
+	filter := bson.M{
+		"$or": []bson.M{
+			{"email": email},
+			{"nickname": nickname},
+		},
+		"logoutTime": bson.M{
+			"$lte": time.Date(2, 2, 2, 0, 0, 0, 0, time.UTC),
+		},
+		"tokens": bson.M{
+			"token": bson.M{
+				"$eq": token,
+			},
+		},
+	}
+	update := bson.M{
+		"$set": bson.M{
+			"logoutTime": time.Now(),
+		},
+	}
+	result := collection.FindOneAndUpdate(context.TODO(), filter, update)
 	return result.Err()
 }
 
 func AddAuthToken(email string, token entity.AuthToken) error {
 	collection := client.Database(SK_DB_NAME).Collection(USER_COLLECTION_NAME)
-	filter := bson.M {
+	filter := bson.M{
 		"email": email,
 	}
-	update := bson.M {
-		"$push": bson.M {
+	update := bson.M{
+		"$push": bson.M{
 			"tokens": token,
 		},
 	}

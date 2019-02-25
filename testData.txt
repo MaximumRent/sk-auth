@@ -8,3 +8,37 @@
 	  "password":"5550123"
   }
 }
+
+/login
+{
+  "message":"Somebody once told me the world is gonna roll me",
+  "code": 4,
+  "payload": {
+	  "login":"",
+	  "password":"",
+	  "authDevice":""
+  }
+}
+
+/user/update
+{
+    "message":"Somebody once told me the world is gonna roll me",
+    "code": 1,
+    "payload": {
+    	  "email":"",
+    	  "nickname":"",
+    	  "token"
+    	  // additional data
+      }
+}
+
+/validate
+{
+  "message":"Somebody once told me the world is gonna roll me",
+  "code": 2,
+  "payload": {
+	  "email": "",
+      "token": "",
+      "nickname": ""
+  }
+}

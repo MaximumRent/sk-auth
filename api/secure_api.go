@@ -1,7 +1,11 @@
 package api
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
+	"net/http"
+	"sk-auth/auth/entity"
+	"sk-auth/mongo"
 	"sk-auth/util"
 )
 
@@ -22,13 +26,45 @@ func InitSecureApi(router *gin.Engine) {
 }
 
 func updateUserInfo(context *gin.Context) {
-	println("updateUserInfo")
+	payload := context.MustGet(USER_INFO_KEY)
+	user := payload.(*entity.User)
+	if user.Email == "" || user.Password == "" || user.Nickname == "" {
+		message := *INVALID_UPDATE_USERINFO_MESSAGE
+		message.Payload = errors.New("Email, Password or Nickname can't be empty!")
+		context.JSON(http.StatusBadRequest, gin.H{"message": message})
+	}
+	err := mongo.UpdateUserInfo(*user)
+	if err != nil {
+		message := *INVALID_UPDATE_USERINFO_MESSAGE
+		message.Payload = err
+		context.JSON(http.StatusBadRequest, gin.H{"message": message})
+	} else {
+		message := *SUCCESSFULL_UPDATE_USERINFO_MESSAGE
+		message.Payload = user
+		context.JSON(http.StatusOK, gin.H{"message": message})
+	}
 }
 
+// VALIDATE_TOKEN_PATH
+// Main validation will do in TokenValidationMiddleware
+// If validation will be success, this endpoint return success message
 func validateToken(context *gin.Context) {
-	println("validateToken")
+	message := *SUCCESSFULL_TOKEN_VALIDATION_MESSAGE
+	message.Payload = context.MustGet(SHORT_USER_INFO_KEY)
+	context.JSON(http.StatusOK, gin.H{"message": message})
 }
 
 func logoutUser(context *gin.Context) {
-	println("logoutUser")
+	payload := context.MustGet(USER_INFO_KEY)
+	logoutInfo := payload.(*entity.LogoutUserInfo)
+	err := mongo.UpdateUserInfo(*logoutInfo)
+	if err != nil {
+		message := *INVALID_UPDATE_USERINFO_MESSAGE
+		message.Payload = err
+		context.JSON(http.StatusBadRequest, gin.H{"message": message})
+	} else {
+		message := *SUCCESSFULL_UPDATE_USERINFO_MESSAGE
+		message.Payload = ""
+		context.JSON(http.StatusOK, gin.H{"message": message})
+	}
 }
