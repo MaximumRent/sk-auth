@@ -55,15 +55,15 @@ func validateToken(context *gin.Context) {
 }
 
 func logoutUser(context *gin.Context) {
-	payload := context.MustGet(USER_INFO_KEY)
+	payload := context.MustGet(PAYLOAD_KEY)
 	logoutInfo := payload.(*entity.LogoutUserInfo)
-	err := mongo.UpdateUserInfo(*logoutInfo)
+	err := mongo.Logout(logoutInfo.Email, logoutInfo.Nickname, logoutInfo.AuthDevice, logoutInfo.Token)
 	if err != nil {
-		message := *INVALID_UPDATE_USERINFO_MESSAGE
+		message := *INVALID_LOGOUT_MESSAGE
 		message.Payload = err
 		context.JSON(http.StatusBadRequest, gin.H{"message": message})
 	} else {
-		message := *SUCCESSFULL_UPDATE_USERINFO_MESSAGE
+		message := *SUCCESSFULL_LOGOUT_MESSAGE
 		message.Payload = ""
 		context.JSON(http.StatusOK, gin.H{"message": message})
 	}

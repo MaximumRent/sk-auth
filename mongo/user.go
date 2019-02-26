@@ -111,21 +111,37 @@ func Logout(email, nickname, authDevice, token string) error {
 			{"email": email},
 			{"nickname": nickname},
 		},
-		"logoutTime": bson.M{
-			"$lte": time.Date(2, 2, 2, 0, 0, 0, 0, time.UTC),
+		"tokens.logoutTime": bson.M{
+			"$lt": time.Date(2018, 2, 2, 0, 0, 0, 0, time.UTC),
 		},
-		"tokens": bson.M{
-			"token": bson.M{
-				"$eq": token,
-			},
+		"tokens.authDevice": bson.M{
+			"$eq": authDevice,
 		},
+	}
+	user := new(entity.User)
+	err := collection.FindOne(context.TODO(), filter).Decode(&user)
+	if err != nil {
+		return err
+	}
+
+	for _, authToken := range user.AuthTokens {
+		if authToken.Token == token && authToken.AuthDevice == authDevice && !authToken.LogoutTime.After(time.Date(2, 2, 2, 0, 0, 0, 0, time.UTC)) {
+			authToken.LogoutTime = time.Now()
+		}
 	}
 	update := bson.M{
 		"$set": bson.M{
-			"logoutTime": time.Now(),
+			"tokens": user.AuthTokens,
 		},
 	}
 	result := collection.FindOneAndUpdate(context.TODO(), filter, update)
+	//update := bson.M{
+	//	"$set": bson.M{
+	//		"logoutTime": time.Now(),
+	//	},
+	//}
+	////opt := &options.FindOneAndUpdateOptions{ArrayFilters: &options.ArrayFilters{Filters: []interface{}()},}
+	//result := collection.FindOneAndUpdate(context.TODO(), filter, update)
 	return result.Err()
 }
 

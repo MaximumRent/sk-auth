@@ -13,7 +13,7 @@ const (
 	MESSAGE_KEY         = "message"
 	PAYLOAD_KEY         = "message.payload"
 	USER_INFO_KEY       = "message.payload.userinfo"
-	SHORT_USER_INFO_KEY = "message.payload.userinfo"
+	SHORT_USER_INFO_KEY = "message.payload.short"
 )
 
 // Middleware which validates user token
@@ -22,7 +22,10 @@ func TokenValidationMiddleware(context *gin.Context) {
 	shortUser := payload.(*entity.ShortUser)
 	err := mongo.ValidateAuthToken(shortUser.Email, shortUser.Nickname, shortUser.Token)
 	if err != nil {
-		context.JSON(http.StatusUnauthorized, gin.H{"error": "You haven't valid authentication token"})
+		message := *INVALID_TOKEN_MESSAGE
+		message.Payload = err
+		context.JSON(http.StatusUnauthorized, gin.H{"message": message})
+		context.Abort()
 		return
 	}
 }
@@ -91,6 +94,11 @@ func extractPayload(message *Message, context *gin.Context) validation.SelfValid
 		if err := mapstructure.Decode(payload, logoutInfo); err != nil {
 			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}
+		shortUser := new(entity.ShortUser)
+		if err := mapstructure.Decode(payload, shortUser); err != nil {
+			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+		context.Set(SHORT_USER_INFO_KEY, shortUser)
 		return logoutInfo
 	default:
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid code type"})

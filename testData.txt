@@ -42,3 +42,15 @@
       "nickname": ""
   }
 }
+
+/logout
+{
+    "message": "AHAHAHA",
+    "code": 5,
+    "payload": {
+        "email": "4someemaile@gmail.com",
+        "token": "da0e13a2-24f7-483d-b1a5-9b63fd9fbe52",
+        "nickname": "4someNickname"
+        "authDevice": "rest-man"
+    }
+}
