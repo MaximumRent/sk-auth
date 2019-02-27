@@ -13,6 +13,7 @@ const (
 	LOGOUT_USER_PATH    = "/logout"
 	VALIDATE_TOKEN_PATH = "/validate"
 	UPDATE_USER_INFO    = "/user/update"
+	USER_HAS_ACCESS_TO    = "/user/access"
 )
 
 func InitSecureApi(router *gin.Engine) {
@@ -25,6 +26,12 @@ func InitSecureApi(router *gin.Engine) {
 	}
 }
 
+// USER_HAS_ACCESS_TO
+func checkPermissions(context *gin.Context) {
+
+}
+
+// UPDATE_USER_INFO
 func updateUserInfo(context *gin.Context) {
 	payload := context.MustGet(USER_INFO_KEY)
 	user := payload.(*entity.User)
@@ -54,6 +61,7 @@ func validateToken(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{"message": message})
 }
 
+// LOGOUT_USER_PATH
 func logoutUser(context *gin.Context) {
 	payload := context.MustGet(PAYLOAD_KEY)
 	logoutInfo := payload.(*entity.LogoutUserInfo)

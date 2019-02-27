@@ -77,6 +77,11 @@ func UpdateUserInfo(user entity.User) error {
 	return result.Err()
 }
 
+func UserHasAccessTo() error {
+	//collection := client.Database(SK_DB_NAME).Collection(USER_COLLECTION_NAME)
+	return nil
+}
+
 func ValidateAuthToken(email, nickname, token string) error {
 	collection := client.Database(SK_DB_NAME).Collection(USER_COLLECTION_NAME)
 	filter := bson.M{

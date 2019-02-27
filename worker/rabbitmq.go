@@ -5,6 +5,7 @@ import (
 	"github.com/streadway/amqp"
 	"log"
 	"sk-auth/errors"
+	"sk-auth/mongo"
 )
 
 type RabbitMqBroker struct {
@@ -18,6 +19,7 @@ type RabbitMqBroker struct {
 
 const (
 	_AUTH_QUEUE_NAME = "sk-auth"
+	_AUTH_EXCHANGE_NAME = "sk-auth-exchange"
 )
 
 func (broker *RabbitMqBroker) Start() {
@@ -52,29 +54,68 @@ func subscribeToQueue(channel *amqp.Channel) {
 		nil,              // args
 	)
 	errors.FailOnError(err, "Failed to register a consumer")
-	for deliver := range messages {
-		body := string(deliver.Body)
-		requestMessage := new(AuthRequestMessage)
-		err := json.Unmarshal([]byte(body), requestMessage)
-		if err != nil {
-			log.Println("Can't unmarshal message from RabbitMQ. Cause: ", err)
+	forever := make(chan bool)
+	go func() {
+		for deliver := range messages {
+			body := string(deliver.Body)
+			requestMessage := new(AuthRequestMessage)
+			err := json.Unmarshal([]byte(body), requestMessage)
+			if err != nil {
+				log.Println("Can't unmarshal message from RabbitMQ. Cause: ", err)
+			}
+			processMessage(channel, deliver, requestMessage)
 		}
-		processMessage(requestMessage)
-	}
+	}()
+	<-forever
 }
 
-func processMessage(requestMessage *AuthRequestMessage) {
-	println(requestMessage.MessageSource)
-	println(requestMessage.Path)
-	println(requestMessage.Email)
-	println(requestMessage.Token)
+func processMessage(channel *amqp.Channel, deliver amqp.Delivery,requestMessage *AuthRequestMessage) {
+
+	err := mongo.ValidateAuthToken(requestMessage.Email, requestMessage.Nickname, requestMessage.Token)
+
+	response := new(AuthResponseMessage)
+	response.ReturnedMessage = requestMessage
+	if err != nil {
+		response.HasAccess = false
+	} else {
+		if err != nil {
+			response.HasAccess = false
+		} else {
+			response.HasAccess = true
+		}
+	}
+	jsonBytes, err := json.Marshal(response)
+
+	err = channel.Publish(
+		_AUTH_EXCHANGE_NAME,        // exchange
+		deliver.ReplyTo, // routing key
+		false,     // mandatory
+		false,     // immediate
+		amqp.Publishing{
+			ContentType:   "text/plain",
+			CorrelationId: deliver.CorrelationId,
+			Body:          jsonBytes,
+		})
+
+	deliver.Ack(false)
 }
 
 func initQueue(connection *amqp.Connection) {
+
 	channel, err := connection.Channel()
 	errors.FailOnError(err, "Failed to open a channel")
 	defer channel.Close()
 
+	err = channel.ExchangeDeclare(
+		_AUTH_EXCHANGE_NAME,   // name
+		"topic", // type
+		true,     // durable
+		false,    // auto-deleted
+		false,    // internal
+		false,    // no-wait
+		nil,      // arguments
+	)
+	channel.QueueBind(_AUTH_QUEUE_NAME, "", _AUTH_EXCHANGE_NAME, false, nil)
 	queue, err := channel.QueueDeclare(
 		_AUTH_QUEUE_NAME, // name
 		false,            // durable
