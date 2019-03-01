@@ -40,33 +40,6 @@ db.createCollection("roles", {
 db.roles.createIndex({ "name": 1 }, { unique: true });
 db.roles.createIndex({ "code": 1 }, { unique: true });
 
-var adminRole = {
-    _id: 1,
-    name: "admin",
-    code: 0,
-    isRemovable: false,
-    paths: [
-        {
-            path: "*:*"
-        }
-    ]
-};
-
-var userRole = {
-    _id: 2,
-    name: "user",
-    code: 1,
-    isRemovable: false,
-    paths: [
-        {
-            path: "*:*"
-        }
-    ]
-};
-
-var adminRoleId = db.roles.insertOne(adminRole).insertedId;
-var userRoleId = db.roles.insertOne(userRole).insertedId;
-
 // --- Init User collection ---
 var tokensDefinition = {
     bsonType: "array",
@@ -148,19 +121,6 @@ db.createCollection("users", {
 
 db.users.createIndex({ "nickname": 1 }, { unique: true });
 db.users.createIndex({ "email": 1 }, { unique: true });
-
-// -- Init data ---
-
-var admin = {
-    nickname: "root",
-    email: "admin@email.com",
-    password: "$2a$04$u3MXPUix1X8Lg8b8AK4lZOIRCDLZmj/cI0UlHA4Ri2LSBMSBEvpAu",
-    gender: "M",
-    roles: [{role_id: adminRoleId}],
-    tokens: []
-};
-
-db.users.insert(admin);
 
 // var adminRole = {
 //     name: "Admin",

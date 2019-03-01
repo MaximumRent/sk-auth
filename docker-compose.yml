@@ -21,5 +21,6 @@ services:
     volumes:
       - ./data/db:/data/db
       - ./db/database-init.js:/docker-entrypoint-initdb.d/database-init.js
+      - ./db/database-init-data.js:/docker-entrypoint-initdb.d/database-init-data.js
     ports:
       - 27017:27017
