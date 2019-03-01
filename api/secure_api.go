@@ -23,12 +23,25 @@ func InitSecureApi(router *gin.Engine) {
 		secureGroup.POST(LOGOUT_USER_PATH, logoutUser)
 		secureGroup.POST(VALIDATE_TOKEN_PATH, validateToken)
 		secureGroup.POST(UPDATE_USER_INFO, updateUserInfo)
+		secureGroup.POST(USER_HAS_ACCESS_TO, checkPermissions)
 	}
 }
 
 // USER_HAS_ACCESS_TO
 func checkPermissions(context *gin.Context) {
-
+	payload := context.MustGet(PAYLOAD_KEY)
+	shortUserInfo := context.MustGet(SHORT_USER_INFO_KEY).(*entity.ShortUser)
+	accessRequest := payload.(*entity.AccessRequest)
+	err := mongo.UserHasAccessTo(accessRequest, shortUserInfo)
+	if err != nil {
+		message := *INVALID_PERMISSION_MESSAGE
+		message.Payload = err
+		context.JSON(http.StatusBadRequest, gin.H{"message": message})
+	} else {
+		message := *SUCCESSFULL_PERMISSION_MESSAGE
+		message.Payload = accessRequest
+		context.JSON(http.StatusOK, gin.H{"message": message})
+	}
 }
 
 // UPDATE_USER_INFO

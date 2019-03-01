@@ -77,9 +77,29 @@ func UpdateUserInfo(user entity.User) error {
 	return result.Err()
 }
 
-func UserHasAccessTo() error {
-	//collection := client.Database(SK_DB_NAME).Collection(USER_COLLECTION_NAME)
-	return nil
+func UserHasAccessTo(request *entity.AccessRequest, shortUser *entity.ShortUser) error {
+	collection := client.Database(SK_DB_NAME).Collection(USER_COLLECTION_NAME)
+	filter := bson.M{
+		"$or": []bson.M{
+			{"email": shortUser.Email},
+			{"nickname": shortUser.Nickname},
+		},
+	}
+	var user = &entity.User{}
+	err := collection.FindOne(context.TODO(), filter).Decode(&user)
+	if err != nil {
+		return err
+	}
+
+	for _, role := range user.Roles {
+		err = CheckPermissionsForRole(request.Path, role.Id)
+		// if found...
+		if err == nil {
+			return nil
+		}
+	}
+
+	return errors.New("You haven't permission to " + request.Path + ".")
 }
 
 func ValidateAuthToken(email, nickname, token string) error {
@@ -140,13 +160,6 @@ func Logout(email, nickname, authDevice, token string) error {
 		},
 	}
 	result := collection.FindOneAndUpdate(context.TODO(), filter, update)
-	//update := bson.M{
-	//	"$set": bson.M{
-	//		"logoutTime": time.Now(),
-	//	},
-	//}
-	////opt := &options.FindOneAndUpdateOptions{ArrayFilters: &options.ArrayFilters{Filters: []interface{}()},}
-	//result := collection.FindOneAndUpdate(context.TODO(), filter, update)
 	return result.Err()
 }
 

@@ -28,6 +28,10 @@ var (
 		Message: "Your logout completed successful.",
 		Code:    _SUCCESSFULL_LOGOUT,
 	}
+	SUCCESSFULL_PERMISSION_MESSAGE = &Message{
+		Message: "Permission checking completed successful.",
+		Code:    _SUCCESSFULL_PERMISSION,
+	}
 )
 
 // ERROR MESSAGES
@@ -51,5 +55,9 @@ var (
 	INVALID_LOGOUT_MESSAGE = &Message{
 		Message: "Something went wrong across your logout. Please try again.",
 		Code:    _INVALID_LOGOUT,
+	}
+	INVALID_PERMISSION_MESSAGE = &Message{
+		Message: "You haven't permission to do that.",
+		Code:    _INVALID_PERMISSION,
 	}
 )

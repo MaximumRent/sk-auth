@@ -28,6 +28,7 @@ func TokenValidationMiddleware(context *gin.Context) {
 		context.Abort()
 		return
 	}
+	context.Set(SHORT_USER_INFO_KEY, shortUser)
 }
 
 func MessageMappingMiddleware(context *gin.Context) {
