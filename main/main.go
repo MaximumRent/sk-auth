@@ -6,7 +6,6 @@ import (
 	"sk-auth/api"
 	"sk-auth/mongo"
 	"sk-auth/util"
-	"sk-auth/worker"
 )
 
 func main() {
@@ -15,7 +14,7 @@ func main() {
 	api.InitSecureApi(router)
 	mongo.InitMongoDb()
 	defer mongo.CloseConnection()
-	go worker.GetBroker().Start()
+	//go worker.GetBroker().Start()
 	router.Run(getDefaultAddress())
 }
 

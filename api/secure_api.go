@@ -14,6 +14,7 @@ const (
 	VALIDATE_TOKEN_PATH = "/validate"
 	UPDATE_USER_INFO    = "/user/update"
 	USER_HAS_ACCESS_TO    = "/user/access"
+	ADD_NEW_ROLE_TO_USER = "/user/add/role"
 )
 
 func InitSecureApi(router *gin.Engine) {
@@ -24,7 +25,14 @@ func InitSecureApi(router *gin.Engine) {
 		secureGroup.POST(VALIDATE_TOKEN_PATH, validateToken)
 		secureGroup.POST(UPDATE_USER_INFO, updateUserInfo)
 		secureGroup.POST(USER_HAS_ACCESS_TO, checkPermissions)
+		secureGroup.POST(ADD_NEW_ROLE_TO_USER, addRole)
 	}
+}
+
+func addRole(context *gin.Context) {
+	payload := context.MustGet(PAYLOAD_KEY)
+	shortUserInfo := context.MustGet(SHORT_USER_INFO_KEY).(*entity.ShortUser)
+
 }
 
 // USER_HAS_ACCESS_TO

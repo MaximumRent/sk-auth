@@ -45,12 +45,24 @@
 
 /logout
 {
-    "message": "AHAHAHA",
+    "message": "Somebody once told me the world is gonna roll me",
     "code": 5,
     "payload": {
-        "email": "4someemaile@gmail.com",
-        "token": "da0e13a2-24f7-483d-b1a5-9b63fd9fbe52",
-        "nickname": "4someNickname"
-        "authDevice": "rest-man"
+        "email": "",
+        "token": "",
+        "nickname": ""
+        "authDevice": ""
+    }
+}
+
+/user/access
+{
+    "message": "Somebody once told me the world is gonna roll me",
+    "code": 6,
+    "payload": {
+        "email": "",
+        "token": "",
+        "nickname": "",
+        "path": "*:*"
     }
 }

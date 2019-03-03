@@ -30,11 +30,11 @@ func hasAccess(requestedAccess, roleAccess string) bool {
 
 func AddPathToRole(roleName string, path string) error {
 	collection := client.Database(SK_DB_NAME).Collection(ROLES_COLLECTION_NAME)
-	filter := bson.M{
+	filter := bson.M {
 		"name": roleName,
 	}
-	update := bson.M{
-		"$push": bson.M{
+	update := bson.M {
+		"$push": bson.M {
 			"path": path,
 		},
 	}
@@ -58,8 +58,8 @@ func CheckPermissionsForRole(accessRequestPath string, roleId int) error {
 
 func getRoleById(roleId int) (*entity.UserRole, error) {
 	collection := client.Database(SK_DB_NAME).Collection(ROLES_COLLECTION_NAME)
-	filter := bson.D{
-		{"_id", roleId},
+	filter := bson.M {
+		"_id": roleId,
 	}
 	var role *entity.UserRole
 	var err error
