@@ -8,6 +8,9 @@ const (
 	_MAP_PAYLOAD_TO_LOGIN_INFO   		= 4
 	_MAP_PAYLOAD_TO_LOGOUT_USER  		= 5
 	_MAP_PAYLOAD_TO_TOKEN_VALIDATION 	= 6
+	_MAP_PAYLOAD_TO_ADD_ROLE		 	= 7
+	_MAP_PAYLOAD_TO_DELETE_ROLE		 	= 8
+
 )
 
 // Success message codes
@@ -18,6 +21,8 @@ const (
 	_SUCCESSFULL_TOKEN_VALIDATION = 103
 	_SUCCESSFULL_LOGOUT           = 104
 	_SUCCESSFULL_PERMISSION       = 105
+	_SUCCESSFULL_ADD_ROLE         = 106
+	_SUCCESSFULL_DELETE_ROLE      = 107
 )
 
 // Error message codes
@@ -28,4 +33,6 @@ const (
 	_INVALID_TOKEN           = 203
 	_INVALID_LOGOUT          = 204
 	_INVALID_PERMISSION      = 205
+	_INVALID_ADD_ROLE      	 = 206
+	_INVALID_DELETE_ROLE     = 207
 )

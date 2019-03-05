@@ -29,6 +29,7 @@ func InitSecureApi(router *gin.Engine) {
 	}
 }
 
+// ADD_NEW_ROLE_TO_USER
 func addRole(context *gin.Context) {
 	payload := context.MustGet(PAYLOAD_KEY)
 	shortUserInfo := context.MustGet(SHORT_USER_INFO_KEY).(*entity.ShortUser)
