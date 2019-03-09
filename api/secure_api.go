@@ -14,7 +14,8 @@ const (
 	VALIDATE_TOKEN_PATH = "/validate"
 	UPDATE_USER_INFO    = "/user/update"
 	USER_HAS_ACCESS_TO    = "/user/access"
-	ADD_NEW_ROLE_TO_USER = "/user/add/role"
+	ADD_NEW_ROLE_TO_USER = "/user/role/add"
+	DELETE_USER_ROLE = "/user/role/delete"
 )
 
 func InitSecureApi(router *gin.Engine) {
@@ -26,6 +27,24 @@ func InitSecureApi(router *gin.Engine) {
 		secureGroup.POST(UPDATE_USER_INFO, updateUserInfo)
 		secureGroup.POST(USER_HAS_ACCESS_TO, checkPermissions)
 		secureGroup.POST(ADD_NEW_ROLE_TO_USER, addRole)
+		secureGroup.POST(DELETE_USER_ROLE, deleteRole)
+	}
+}
+
+// DELETE_USER_ROLE
+func deleteRole(context *gin.Context) {
+	payload := context.MustGet(PAYLOAD_KEY)
+	shortUserInfo := context.MustGet(SHORT_USER_INFO_KEY).(*entity.ShortUser)
+	changeRoleRequest := payload.(*entity.ChangeRoleRequest)
+	err := mongo.DeleteUserRole(shortUserInfo.Email, shortUserInfo.Nickname, changeRoleRequest.RoleName)
+	if err != nil {
+		message := *INVALID_DELETE_ROLE_MESSAGE
+		message.Payload = err
+		context.JSON(http.StatusBadRequest, gin.H{"message": message})
+	} else {
+		message := SUCCESSFULL_DELETE_ROLE_MESSAGE
+		message.Payload = changeRoleRequest
+		context.JSON(http.StatusOK, gin.H{"message": message})
 	}
 }
 
@@ -33,7 +52,17 @@ func InitSecureApi(router *gin.Engine) {
 func addRole(context *gin.Context) {
 	payload := context.MustGet(PAYLOAD_KEY)
 	shortUserInfo := context.MustGet(SHORT_USER_INFO_KEY).(*entity.ShortUser)
-
+	changeRoleRequest := payload.(*entity.ChangeRoleRequest)
+	err := mongo.AddRoleToUser(shortUserInfo.Email, shortUserInfo.Nickname, changeRoleRequest.RoleName)
+	if err != nil {
+		message := *INVALID_ADD_ROLE_MESSAGE
+		message.Payload = err
+		context.JSON(http.StatusBadRequest, gin.H{"message": message})
+	} else {
+		message := SUCCESSFULL_ADD_ROLE_MESSAGE
+		message.Payload = changeRoleRequest
+		context.JSON(http.StatusOK, gin.H{"message": message})
+	}
 }
 
 // USER_HAS_ACCESS_TO

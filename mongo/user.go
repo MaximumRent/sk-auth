@@ -132,7 +132,7 @@ func ValidateAuthToken(email, nickname, token string) error {
 func Logout(email, nickname, authDevice, token string) error {
 	collection := client.Database(SK_DB_NAME).Collection(USER_COLLECTION_NAME)
 	filter := bson.M{
-		"$or": []bson.M{
+		"$or": []bson.M {
 			{"email": email},
 			{"nickname": nickname},
 		},
@@ -196,19 +196,49 @@ func UpdateAuthToken(email string, token entity.AuthToken) error {
 	return result.Err()
 }
 
-func AddRoleToUser(email string, roleId int) error {
+func DeleteUserRole(email, nickname, roleName string) error {
 	collection := client.Database(SK_DB_NAME).Collection(USER_COLLECTION_NAME)
-	userFilter := bson.D{
-		{"email", email},
+	userFilter := bson.M {
+		"$or": []bson.M {
+			bson.M {"email": email},
+			bson.M {"nickname": nickname},
+		},
 	}
-	err := checkRoleIsExist(roleId)
+	role, err := getRoleByName(roleName)
 	if err != nil {
 		return err
 	}
-	update := bson.D{
-		{"$push", bson.D{
-			{"roles", roleId},
-		}},
+	if role.IsDeletable == false {
+		return errors.New("Can't delete this role.")
+	}
+
+	update := bson.M {
+		"$pull": bson.M {
+			"roles": bson.M {
+				"role_id": role.Id,
+			},
+		},
+	}
+	result := collection.FindOneAndUpdate(context.TODO(), userFilter, update)
+	return result.Err()
+}
+
+func AddRoleToUser(email, nickname, roleName string) error {
+	collection := client.Database(SK_DB_NAME).Collection(USER_COLLECTION_NAME)
+	userFilter := bson.M {
+		"$or": []bson.M {
+			bson.M {"email": email},
+			bson.M {"nickname": nickname},
+		},
+	}
+	role, err := getRoleByName(roleName)
+	if err != nil {
+		return err
+	}
+	update := bson.M {
+		"$push": bson.M {
+			"roles": &entity.ShortUserRole{Id:role.Id},
+		},
 	}
 	result := collection.FindOneAndUpdate(context.TODO(), userFilter, update)
 	return result.Err()

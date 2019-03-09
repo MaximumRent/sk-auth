@@ -66,3 +66,27 @@
         "path": "*:*"
     }
 }
+
+/user/role/add
+{
+    "message": "Somebody once told me the world is gonna roll me",
+    "code": 7,
+    "payload": {
+        "email": "",
+        "token": "",
+        "nickname": "",
+        "role_name": ""
+    }
+}
+
+/user/role/delete
+{
+    "message": "Somebody once told me the world is gonna roll me",
+    "code": 7,
+    "payload": {
+        "email": "",
+        "token": "",
+        "nickname": "",
+        "role_name": ""
+    }
+}

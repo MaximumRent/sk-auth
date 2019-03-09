@@ -22,7 +22,7 @@ type UserRole struct {
 	Id          int         `bson:"_id"`
 	Name        string      `json:"name" bson:"name"`
 	Code        int64       `json:"code" bson:"code"`
-	IsDeletable bool        `json:"isDeletable" bson:"isDeletable"`
+	IsDeletable bool        `json:"isRemovable" bson:"isRemovable"`
 	Paths       []*RolePath `bson:"paths"`
 }
 

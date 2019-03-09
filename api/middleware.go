@@ -112,6 +112,17 @@ func extractPayload(message *Message, context *gin.Context) validation.SelfValid
 		}
 		context.Set(SHORT_USER_INFO_KEY, shortUser)
 		return accessRequest
+	case _MAP_PAYLOAD_TO_CHANGE_ROLE:
+		changeRoleRequest := new(entity.ChangeRoleRequest)
+		if err := mapstructure.Decode(payload, changeRoleRequest); err != nil {
+			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+		shortUser := new(entity.ShortUser)
+		if err := mapstructure.Decode(payload, shortUser); err != nil {
+			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+		context.Set(SHORT_USER_INFO_KEY, shortUser)
+		return changeRoleRequest
 	default:
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid code type"})
 		return nil
