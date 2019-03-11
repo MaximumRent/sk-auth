@@ -10,8 +10,10 @@ import (
 
 // API paths
 const (
-	REGISTER_USER_PATH = "/registration"
-	LOGIN_USER_PATH    = "/login"
+	REGISTER_USER_PATH 			= "/registration"
+	LOGIN_USER_PATH    			= "/login"
+	GOOGLE_OAUTH    			= "/login/google"
+	GOOGLE_OAUTH_CALLBACK    	= "/oauth/google/callback"
 )
 
 func InitOpenApi(router *gin.Engine) {
@@ -20,7 +22,17 @@ func InitOpenApi(router *gin.Engine) {
 	{
 		openGroup.POST(REGISTER_USER_PATH, registerUser)
 		openGroup.POST(LOGIN_USER_PATH, login)
+		openGroup.POST(GOOGLE_OAUTH, googleOauth)
+		openGroup.POST(GOOGLE_OAUTH_CALLBACK, googleOauthCallback)
 	}
+}
+
+func googleOauth(context *gin.Context) {
+
+}
+
+func googleOauthCallback(context *gin.Context) {
+
 }
 
 // LOGIN_USER_PATH

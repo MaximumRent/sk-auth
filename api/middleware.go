@@ -123,6 +123,8 @@ func extractPayload(message *Message, context *gin.Context) validation.SelfValid
 		}
 		context.Set(SHORT_USER_INFO_KEY, shortUser)
 		return changeRoleRequest
+	case _MAP_PAYLOAD_TO_GOOGLE_OAUTH:
+		return nil
 	default:
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid code type"})
 		return nil
