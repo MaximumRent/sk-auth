@@ -10,6 +10,18 @@ import (
 	"time"
 )
 
+func GetCurrentUser(shortUser *entity.ShortUser, user *entity.User) error {
+	collection := client.Database(SK_DB_NAME).Collection(USER_COLLECTION_NAME)
+	filter := bson.M{
+		"$or": []bson.M{
+			{"email": shortUser.Email},
+			{"nickname": shortUser.Nickname},
+		},
+	}
+	err := collection.FindOne(context.TODO(), filter).Decode(&user)
+	return err
+}
+
 func CreateUser(user entity.User) error {
 	if user.Nickname == "" {
 		return errors.New("User nickname can't be empty!")

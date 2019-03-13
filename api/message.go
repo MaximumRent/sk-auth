@@ -40,6 +40,10 @@ var (
 		Message: "Role deleted successful.",
 		Code:    _SUCCESSFULL_DELETE_ROLE,
 	}
+	SUCCESSFULL_GET_USER_MESSAGE = &Message {
+		Message: "User information got successful.",
+		Code:    _SUCCESSFULL_GET_USER,
+	}
 )
 
 // ERROR MESSAGES
@@ -75,5 +79,9 @@ var (
 	INVALID_DELETE_ROLE_MESSAGE = &Message {
 		Message: "Role wasn't delete.",
 		Code:    _INVALID_DELETE_ROLE,
+	}
+	INVALID_GET_USER_MESSAGE = &Message {
+		Message: "User information wasn't get.",
+		Code:    _INVALID_GET_USER,
 	}
 )

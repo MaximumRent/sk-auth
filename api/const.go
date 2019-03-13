@@ -24,6 +24,7 @@ const (
 	_SUCCESSFULL_ADD_ROLE         = 106
 	_SUCCESSFULL_DELETE_ROLE      = 107
 	_SUCCESSFULL_GOOGLE_AUTH      = 108
+	_SUCCESSFULL_GET_USER      	  = 109
 )
 
 // Error message codes
@@ -37,4 +38,5 @@ const (
 	_INVALID_ADD_ROLE      	 = 206
 	_INVALID_DELETE_ROLE     = 207
 	_INVALID_GOOGLE_AUTH     = 208
+	_INVALID_GET_USER        = 209
 )

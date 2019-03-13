@@ -16,18 +16,37 @@ const (
 	USER_HAS_ACCESS_TO    = "/user/access"
 	ADD_NEW_ROLE_TO_USER = "/user/role/add"
 	DELETE_USER_ROLE = "/user/role/delete"
+	GET_USER_INFO = "/user/info"
 )
 
 func InitSecureApi(router *gin.Engine) {
 	secureGroup := router.Group(util.SECURE_API_GROUP)
 	secureGroup.Use(MessageMappingMiddleware, EntityValidationMiddleware, TokenValidationMiddleware)
 	{
+		secureGroup.GET(GET_USER_INFO, getUser)
 		secureGroup.POST(LOGOUT_USER_PATH, logoutUser)
 		secureGroup.POST(VALIDATE_TOKEN_PATH, validateToken)
 		secureGroup.POST(UPDATE_USER_INFO, updateUserInfo)
 		secureGroup.POST(USER_HAS_ACCESS_TO, checkPermissions)
 		secureGroup.POST(ADD_NEW_ROLE_TO_USER, addRole)
 		secureGroup.POST(DELETE_USER_ROLE, deleteRole)
+	}
+}
+
+// GET_USER_INFO
+func getUser(context *gin.Context) {
+	payload := context.MustGet(PAYLOAD_KEY)
+	shortUserInfo := payload.(*entity.ShortUser)
+	user := new(entity.User)
+	err := mongo.GetCurrentUser(shortUserInfo, user)
+	if err != nil {
+		message := *INVALID_GET_USER_MESSAGE
+		message.Payload = err
+		context.JSON(http.StatusBadRequest, gin.H{"message": message})
+	} else {
+		message := SUCCESSFULL_GET_USER_MESSAGE
+		message.Payload = user
+		context.JSON(http.StatusOK, gin.H{"message": message})
 	}
 }
 

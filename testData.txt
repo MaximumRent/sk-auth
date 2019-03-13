@@ -90,3 +90,14 @@
         "role_name": ""
     }
 }
+
+/user/info
+{
+    "message": "Somebody once told me the world is gonna roll me",
+    "code": 2,
+    "payload": {
+        "email": "",
+        "token": "",
+        "nickname": ""
+    }
+}
